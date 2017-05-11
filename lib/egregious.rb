@@ -79,9 +79,11 @@ module Egregious
                                ActiveRecord::UnknownAttributeError=>status_code(:bad_request)
                              })
       begin
-        exception_codes.merge!({
-                                 ActiveRecord::HasAndBelongsToManyAssociationForeignKeyNeeded=>status_code(:bad_request)
-                               })
+        if ActiveRecord.const_defined?("HasAndBelongsToManyAssociationForeignKeyNeeded")
+          exception_codes.merge!({
+                                   ActiveRecord::HasAndBelongsToManyAssociationForeignKeyNeeded=>status_code(:bad_request)
+                                 })
+        end
       rescue => e
         # Unknown if using Rails 4
       end
