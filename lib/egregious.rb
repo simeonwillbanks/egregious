@@ -5,8 +5,9 @@ require 'rack'
 require 'abstract_controller/base'
 require 'action_controller'
 require 'action_controller/metal/request_forgery_protection'
-require 'active_record/errors'
+require 'active_model'
 require 'active_record'
+require 'active_record/errors'
 require 'active_record/associations'
 require 'active_record/validations'
 
@@ -46,74 +47,42 @@ module Egregious
         SecurityError=>status_code(:forbidden)
     }
     # all status codes have a exception class defined
-    Rack::Utils::HTTP_STATUS_CODES.each do |key, value|
+    Rack::Utils::HTTP_STATUS_CODES.each_value do |value|
       exception_codes.merge!(eval("Egregious::#{Egregious.clean_class_name(value)}")=>value.downcase.gsub(/\s|-/, '_').to_sym)
     end
 
-    if defined?(ActionController)
-      exception_codes.merge!({
-                               AbstractController::ActionNotFound=>status_code(:bad_request),
-                               ActionController::InvalidAuthenticityToken=>status_code(:bad_request),
-                               ActionController::MethodNotAllowed=>status_code(:not_allowed),
-                               ActionController::MissingFile=>status_code(:not_found),
-                               ActionController::RoutingError=>status_code(:bad_request),
-                               ActionController::UnknownController=>status_code(:bad_request),
-                               ActionController::UnknownHttpMethod=>status_code(:not_allowed)
-                               #ActionController::MissingTemplate=>status_code(:not_found)
-                             })
-    end
+    require 'egregious/extensions/mongoid' if defined?(Mongoid)
 
-    if defined?(ActiveModel)
-      exception_codes.merge!({
-                                 ActiveModel::MissingAttributeError=>status_code(:bad_request)})
-    end
-
-    if defined?(ActiveRecord)
-      exception_codes.merge!({
-                               ActiveRecord::AttributeAssignmentError=>status_code(:bad_request),
-                               ActiveRecord::MultiparameterAssignmentErrors=>status_code(:bad_request),
-                               ActiveRecord::ReadOnlyAssociation=>status_code(:forbidden),
-                               ActiveRecord::ReadOnlyRecord=>status_code(:forbidden),
-                               ActiveRecord::RecordInvalid=>status_code(:bad_request),
-                               ActiveRecord::RecordNotFound=>status_code(:not_found),
-                               ActiveRecord::UnknownAttributeError=>status_code(:bad_request)
-                             })
-      begin
-        exception_codes.merge!({
-                                 ActiveRecord::HasAndBelongsToManyAssociationForeignKeyNeeded=>status_code(:bad_request)
-                               })
-      rescue => e
-        # Unknown if using Rails 4
-      end
-    end
-    
-    if defined?(Mongoid)
-      require 'egregious/extensions/mongoid'
-      
-      exception_codes.merge!({
-                               Mongoid::Errors::InvalidFind=>status_code(:bad_request),
-                               Mongoid::Errors::DocumentNotFound=>status_code(:not_found),
-                               Mongoid::Errors::Validations=>status_code(:unprocessable_entity)
-                             })
-      
-      if defined?(Mongoid::VERSION) && Mongoid::VERSION > '3'
-        exception_codes.merge!({
-                                 Mongoid::Errors::ReadonlyAttribute=>status_code(:forbidden),
-                                 Mongoid::Errors::UnknownAttribute=>status_code(:bad_request)
-                               })
-      end
-    end
-
-    if defined?(Warden)
-      exception_codes.merge!({
-                                 Warden::NotAuthenticated=>status_code(:unauthorized),
-                             })
-    end
-
-    if defined?(CanCan)
+    {
+      "AbstractController::ActionNotFound" => :bad_request,
+      "ActionController::InvalidAuthenticityToken" => :bad_request,
+      "ActionController::MethodNotAllowed" => :not_allowed,
+      "ActionController::MissingFile" => :not_found,
+      "ActionController::RoutingError" => :bad_request,
+      "ActionController::UnknownHttpMethod" => :not_allowed,
+      "ActionController::UnknownController" => :bad_request,
+      "ActiveModel::MissingAttributeError" => :bad_request,
+      "ActiveRecord::AttributeAssignmentError" => :bad_request,
+      "ActiveRecord::MultiparameterAssignmentErrors" => :bad_request,
+      "ActiveRecord::ReadOnlyAssociation" => :forbidden,
+      "ActiveRecord::ReadOnlyRecord" => :forbidden,
+      "ActiveRecord::RecordInvalid" => :bad_request,
+      "ActiveRecord::RecordNotFound" => :not_found,
+      "ActiveRecord::UnknownAttributeError" => :bad_request,
+      "ActiveRecord::HasAndBelongsToManyAssociationForeignKeyNeeded" => :bad_request,
+      "Mongoid::Errors::InvalidFind" => :bad_request,
+      "Mongoid::Errors::DocumentNotFound" => :not_found,
+      "Mongoid::Errors::Validations" => :unprocessable_entity,
+      "Mongoid::Errors::ReadonlyAttribute" => :forbidden,
+      "Mongoid::Errors::UnknownAttribute" => :bad_request,
+      "Warden::NotAuthenticated" => :unauthorized,
       # technically this should be forbidden, but for some reason cancan returns AccessDenied when you are not logged in
-      exception_codes.merge!({CanCan::AccessDenied=>status_code(:unauthorized)})
-      exception_codes.merge!({CanCan::AuthorizationNotPerformed => status_code(:unauthorized)})
+      "CanCan::AccessDenied" => :unauthorized,
+      "CanCan::AuthorizationNotPerformed" => :unauthorized,
+    }.each do |constant_str, code|
+      if Object.const_defined?(constant_str)
+        exception_codes.merge!(Object.const_get(constant_str) => status_code(code))
+      end
     end
 
     @@exception_codes = exception_codes
@@ -217,7 +186,7 @@ module Egregious
       end
     end
   end
-  
+
   # override this if you want to change your respond_to behavior
   def egregious_respond_to(exception)
     respond_to do |format|

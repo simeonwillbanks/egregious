@@ -1,9 +1,7 @@
 *.gem
 .bundle
-Gemfile.lock
 pkg/*
 .idea
 .ruby-version
-*.gemfile.lock
 log/test.log
 

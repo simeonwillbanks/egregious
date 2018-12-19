@@ -2,13 +2,8 @@ language: ruby
 gemfile:
   - gemfiles/rails_3.gemfile
   - gemfiles/rails_4.gemfile
+  - gemfiles/rails_5.gemfile
 rvm:
   - "1.9.3"
   - "2.2.3"
-
-#matrix:
-#  allow_failures:
-#    - env: "RAILS_VERSION=master"
-#    - rvm: ruby-head
-# uncomment this line if your project needs to run something other than `rake`:
-# script: bundle exec rspec spec
+  - "2.5.3"

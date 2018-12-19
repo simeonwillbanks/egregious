@@ -4,5 +4,10 @@ appraise "rails-3" do
 end
 
 appraise "rails-4" do
-  gem "rails", "4.2.5"
+  gem "rails", "4.2.9"
+end
+
+appraise "rails-5" do
+  gem "rails", "5.2.2"
+  gem 'rails-controller-testing'
 end

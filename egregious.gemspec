@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
 
-  s.add_runtime_dependency "rails", '> 3.0', '< 5'
+  s.add_runtime_dependency "rails", '> 3.0', '< 6'
   s.add_runtime_dependency "rack", '>= 1.2.5'
   s.add_runtime_dependency "htmlentities"
 
@@ -28,9 +28,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "json"
   s.add_development_dependency "hpricot"
+  s.add_development_dependency "airbrake", "~> 5.0"
   s.add_development_dependency "warden"
   s.add_development_dependency "cancan"
   s.add_development_dependency "mongoid"
   s.add_development_dependency "appraisal"
-
 end

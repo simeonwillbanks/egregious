@@ -2,7 +2,6 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 ENV["RAILS_ENV"] ||= "test"
 
-require 'rubygems'
 require 'bundler/setup'
 require 'bundler'
 Bundler.setup
@@ -13,16 +12,27 @@ require 'action_controller'
 require 'warden'
 require 'cancan'
 require 'mongoid'
+require "rails"
 
 #root = File.expand_path(File.dirname(__FILE__))
 
+def rails_major_version
+  Rails.version.split(".").first.to_i
+end
+
+def rails_version_lt_eq(major)
+  rails_major_version <= major
+end
+
 ENV["RAILS_ENV"] = "test"
-require "rails"
-case Rails.version
-when '3.2.22'
+case rails_major_version
+when 3
   require "apps/rails3_2"
-when '4.2.5'
+when 4
   require "apps/rails4"
+when 5
+  require "apps/rails5"
+  require 'rails-controller-testing'
 end
 
 require 'rspec/rails'

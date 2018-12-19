@@ -53,37 +53,6 @@ describe Egregious do
       expect(exception_codes[SecurityError]).to eq(Egregious.status_code(:forbidden))
     end
 
-    if defined?(ActionController)
-      it "should return expected errors for ActionController" do
-        expect(exception_codes[AbstractController::ActionNotFound]).to eq(Egregious.status_code(:bad_request))
-        expect(exception_codes[ActionController::InvalidAuthenticityToken]).to eq(Egregious.status_code(:bad_request))
-        expect(exception_codes[ActionController::MethodNotAllowed]).to eq(Egregious.status_code(:not_allowed))
-        expect(exception_codes[ActionController::MissingFile]).to eq(Egregious.status_code(:not_found))
-        expect(exception_codes[ActionController::RoutingError]).to eq(Egregious.status_code(:bad_request))
-        expect(exception_codes[ActionController::UnknownController]).to eq(Egregious.status_code(:bad_request))
-        expect(exception_codes[ActionController::UnknownHttpMethod]).to eq(Egregious.status_code(:not_allowed))
-        #exception_codes[ActionController::MissingTemplate].should ==  Egregious.status_code(:not_found)
-      end
-    end
-
-    if defined?(ActiveModel)
-      it "should return expected errors for ActiveModel" do
-        expect(exception_codes[ActiveModel::MissingAttributeError]).to eq(Egregious.status_code(:bad_request))
-      end
-    end
-
-    if defined?(ActiveRecord)
-      it "should return expected errors for ActiveRecord" do
-        expect(exception_codes[ActiveRecord::AttributeAssignmentError]).to eq(Egregious.status_code(:bad_request))
-        expect(exception_codes[ActiveRecord::MultiparameterAssignmentErrors]).to eq(Egregious.status_code(:bad_request))
-        expect(exception_codes[ActiveRecord::ReadOnlyAssociation]).to eq(Egregious.status_code(:forbidden))
-        expect(exception_codes[ActiveRecord::ReadOnlyRecord]).to eq(Egregious.status_code(:forbidden))
-        expect(exception_codes[ActiveRecord::RecordInvalid]).to eq(Egregious.status_code(:bad_request))
-        expect(exception_codes[ActiveRecord::RecordNotFound]).to eq(Egregious.status_code(:not_found))
-        expect(exception_codes[ActiveRecord::UnknownAttributeError]).to eq(Egregious.status_code(:bad_request))
-      end
-    end
-
     if defined?(Warden)
       it "should return expected errors for Warden" do
         expect(exception_codes[Warden::NotAuthenticated]).to eq(Egregious.status_code(:unauthorized))

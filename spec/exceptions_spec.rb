@@ -2,6 +2,7 @@ require 'spec_helper'
 require 'json'
 require 'hpricot'
 require 'htmlentities'
+require 'egregious'
 
 describe Exception do
   it "should output valid xml on to_xml" do

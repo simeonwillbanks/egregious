@@ -1,5 +1,9 @@
 [![Build Status](https://travis-ci.org/voomify/egregious.svg?branch=master)](https://travis-ci.org/voomify/egregious)
 ##### Update Log:
+  * Version 0.3.0 
+    - Added Rails 5 support
+    - Removed Airbrake 4 support
+    - Added gem lockfiles
 
   * Version 0.2.13 Added Airbrake rack env to notifications for Airbrake 4 and 5
 
